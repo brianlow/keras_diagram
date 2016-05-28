@@ -38,9 +38,9 @@ class DiagramTest(unittest.TestCase):
 		model.add(Merge([left, right], mode='concat', concat_axis=1))
 		expected = ("          InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)        " + "\n"
 					"             Reshape (None, 1, 1, 1)                  Reshape (None, 1, 1, 1)     " + "\n"
-					"                    | ______________________________________/                     " + "\n"
-					"                    |/                                                            " + "\n"
-					"               Merge (None, 2, 1, 1)                                              " + "\n"
+					"                     \______________________________________/                     " + "\n"
+					"                                        |                                         " + "\n"
+					"                                   Merge (None, 2, 1, 1)                          " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
@@ -57,9 +57,9 @@ class DiagramTest(unittest.TestCase):
 		model.add(Merge([one, two, three], mode='concat', concat_axis=1))
 		expected = ("          InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)        " + "\n"
 					"             Reshape (None, 1, 1, 1)                  Reshape (None, 1, 1, 1)                  Reshape (None, 1, 1, 1)     " + "\n"
-					"                    | ______________________________________/________________________________________/                     " + "\n"
-					"                    |/                                                                                                     " + "\n"
-					"               Merge (None, 3, 1, 1)                                                                                       " + "\n"
+					"                     \_______________________________________|_______________________________________/                     " + "\n"
+					"                                                             |                                                             " + "\n"
+					"                                                        Merge (None, 3, 1, 1)                                              " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
@@ -77,12 +77,12 @@ class DiagramTest(unittest.TestCase):
 		model.add(Merge([a, b], mode='concat', concat_axis=1))
 		expected = ("          InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)                                                 " + "\n"
 					"             Reshape (None, 1, 1)                     Reshape (None, 1, 1)                                                 " + "\n"
-					"                    | ______________________________________/                                                              " + "\n"
-					"                    |/                                                                      InputLayer (None, 1, 1)        " + "\n"
-					"               Merge (None, 2, 1)                                                              Reshape (None, 1, 1)        " + "\n"
-					"                    | _______________________________________________________________________________/                     " + "\n"
-					"                    |/                                                                                                     " + "\n"
-					"               Merge (None, 3, 1)                                                                                          " + "\n"
+					"                     \______________________________________/                                                              " + "\n"
+					"                                        |                                                   InputLayer (None, 1, 1)        " + "\n"
+					"                                   Merge (None, 2, 1)                                          Reshape (None, 1, 1)        " + "\n"
+					"                                         \___________________________________________________________/                     " + "\n"
+					"                                                             |                                                             " + "\n"
+					"                                                        Merge (None, 3, 1)                                                 " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
@@ -106,29 +106,36 @@ class ArrowsTest(unittest.TestCase):
     def test_draw_left(self):
     	a = Arrows(10)
     	a.draw(3, 7)
-        self.assertEqual(a.line1.value, r'    \_    ')
-        self.assertEqual(a.line2.value, r'      \   ')
+        self.assertEqual(a.line1.value, r'    \___  ')
+        self.assertEqual(a.line2.value, r'       |  ')
 
     def test_draw_right(self):
     	a = Arrows(10)
     	a.draw(7, 3)
-        self.assertEqual(a.line1.value, r'     _/   ')
-        self.assertEqual(a.line2.value, r'    /     ')
+        self.assertEqual(a.line1.value, r'   ___/   ')
+        self.assertEqual(a.line2.value, r'   |      ')
 
     def test_draw_multiple_right(self):
     	a = Arrows(10)
     	a.draw(9, 0)
     	a.draw(6, 0)
-        self.assertEqual(a.line1.value, r'  ___/__/ ')
-        self.assertEqual(a.line2.value, r' /        ')
+        self.assertEqual(a.line1.value, r'_____/__/ ')
+        self.assertEqual(a.line2.value, r'|         ')
 
-    def test_draw_both(self):
+    def test_draw_two(self):
     	a = Arrows(10)
-    	a.draw(3, 3)
-    	a.draw(7, 3)
-    	a.draw(7, 7)
-        self.assertEqual(a.line1.value, r'   | _/|  ')
-        self.assertEqual(a.line2.value, r'   |/  |  ')
+    	a.draw(2, 5)
+    	a.draw(8, 5)
+        self.assertEqual(a.line1.value, r'   \___/  ')
+        self.assertEqual(a.line2.value, r'     |    ')
+
+    def test_draw_three(self):
+    	a = Arrows(10)
+    	a.draw(2, 5)
+    	a.draw(8, 5)
+    	a.draw(5, 5)
+        self.assertEqual(a.line1.value, r'   \_|_/  ')
+        self.assertEqual(a.line2.value, r'     |    ')
 
 class CanvasTest(unittest.TestCase):
 

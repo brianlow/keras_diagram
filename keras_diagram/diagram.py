@@ -22,21 +22,13 @@ class Node:
             return self.layer.__class__.__name__
 
     def _calculate_children(self):
-        layers = list(self._flatten([node.inbound_layers for node in self.layer.inbound_nodes]))
+        layers = list(_flatten([node.inbound_layers for node in self.layer.inbound_nodes]))
         layers = [l.layers[-1] if issubclass(type(l), Model) else l for l in layers]
         return [Node(l) for l in layers]
 
     def _calculate_family_width(self):
         children_width = sum([child.family_width for child in self.children])
         return max([children_width, self.node_width])
-
-    def _flatten(self, items):
-        for i in items:
-            if hasattr(i, '__iter__'):
-                for m in self._flatten(i):
-                    yield m
-            else:
-                yield i
 
     def canvas(self):
         canvas = Canvas()
@@ -45,15 +37,15 @@ class Node:
         for child in self.children:
             c = child.canvas()
             canvas.append_to_right(c)
-            arrows.append((offset + (self.node_width/2), self.node_width/2))
+            arrows.append((offset + _center_of(child.family_width), _center_of(self.family_width)))
             offset += c.width()
         if len(arrows) > 1:
             a = Arrows(canvas.width())
-            for arrow in reversed(arrows):
+            for arrow in reversed(sorted(arrows, key=lambda arr: abs(arr[0] - arr[1]))):
                 a.draw(arrow[0], arrow[1])
             canvas.append_to_bottom(a.line1.value)
             canvas.append_to_bottom(a.line2.value)
-        canvas.append_to_bottom(self.text)
+        canvas.append_to_bottom(self.text.center(self.family_width))
         return canvas
 
     def render(self):
@@ -133,14 +125,25 @@ class Arrows:
             self.line2[x2] = '|'
         elif x1 < x2:
             self.line1[x1+1] = '\\'
-            self.line2[x2-1] = '\\'
-            length = (x2-2) - (x1+2) + 1
-            self.line1[x1+2:x2-2+1] = '_' * length
+            self.line2[x2] = '|'
+            length = (x2) - (x1+2) + 1
+            self.line1[x1+2:x2+1] = '_' * length
         elif x1 > x2:
             self.line1[x1-1] = '/'
-            self.line2[x2+1] = '/'
-            length = (x1-2) - (x2+2) + 1
-            self.line1[x2+2:x1-2+1] = '_' * length
+            self.line2[x2] = '|'
+            length = (x1-2) - (x2) + 1
+            self.line1[x2:x1-2+1] = '_' * length
+
+def _center_of(width):
+    return int((width - 0.5)/2)
+
+def _flatten(items):
+    for i in items:
+        if hasattr(i, '__iter__'):
+            for m in _flatten(i):
+                yield m
+        else:
+            yield i
 
 
 def ascii(model):
