@@ -17,14 +17,14 @@ class DiagramTest(unittest.TestCase):
 		model.add(Flatten())
 		model.add(Dropout(0.5))
 		model.add(Dense(7))
-		expected = ("          InputLayer (None, 50, 300)     " + "\n"
-					"             Reshape (None, 1, 50, 300)  " + "\n"
-					"       Convolution2D (None, 250, 48, 1)  " + "\n"
-					"                Relu (None, 250, 48, 1)  " + "\n"
-					"        MaxPooling2D (None, 250, 1, 1)   " + "\n"
-					"             Flatten (None, 250)         " + "\n"
-					"             Dropout (None, 250)         " + "\n"
-					"               Dense (None, 7)           " + "\n"
+		expected = ("         InputLayer (None, 50, 300)    " + "\n"
+					"            Reshape (None, 1, 50, 300) " + "\n"
+					"      Convolution2D (None, 250, 48, 1) " + "\n"
+					"               Relu (None, 250, 48, 1) " + "\n"
+					"       MaxPooling2D (None, 250, 1, 1)  " + "\n"
+					"            Flatten (None, 250)        " + "\n"
+					"            Dropout (None, 250)        " + "\n"
+					"              Dense (None, 7)          " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
@@ -36,16 +36,15 @@ class DiagramTest(unittest.TestCase):
 		right.add(Reshape((1, 1, 1), input_shape=(1,1)))
 		model = Sequential()
 		model.add(Merge([left, right], mode='concat', concat_axis=1))
-		expected = ("          InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)        " + "\n"
-					"             Reshape (None, 1, 1, 1)                  Reshape (None, 1, 1, 1)     " + "\n"
-					"                     \______________________________________/                     " + "\n"
-					"                                        |                                         " + "\n"
-					"                                   Merge (None, 2, 1, 1)                          " + "\n"
+		expected = ("      InputLayer (None, 1, 1)          InputLayer (None, 1, 1)    " + "\n"
+					"         Reshape (None, 1, 1, 1)          Reshape (None, 1, 1, 1) " + "\n"
+					"                 \______________________________/                 " + "\n"
+					"                                |                                 " + "\n"
+					"                           Merge (None, 2, 1, 1)                  " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
 
-	# TODO: missing uptick on middle stack
 	def test_simple_fan_in_three(self):
 		one = Sequential()
 		one.add(Reshape((1, 1, 1), input_shape=(1,1)))
@@ -55,11 +54,11 @@ class DiagramTest(unittest.TestCase):
 		three.add(Reshape((1, 1, 1), input_shape=(1,1)))
 		model = Sequential()
 		model.add(Merge([one, two, three], mode='concat', concat_axis=1))
-		expected = ("          InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)        " + "\n"
-					"             Reshape (None, 1, 1, 1)                  Reshape (None, 1, 1, 1)                  Reshape (None, 1, 1, 1)     " + "\n"
-					"                     \_______________________________________|_______________________________________/                     " + "\n"
-					"                                                             |                                                             " + "\n"
-					"                                                        Merge (None, 3, 1, 1)                                              " + "\n"
+		expected = ("      InputLayer (None, 1, 1)          InputLayer (None, 1, 1)          InputLayer (None, 1, 1)    " + "\n"
+					"         Reshape (None, 1, 1, 1)          Reshape (None, 1, 1, 1)          Reshape (None, 1, 1, 1) " + "\n"
+					"                 \_______________________________|_______________________________/                 " + "\n"
+					"                                                 |                                                 " + "\n"
+					"                                            Merge (None, 3, 1, 1)                                  " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
@@ -75,14 +74,14 @@ class DiagramTest(unittest.TestCase):
 		b.add(Reshape((1, 1), input_shape=(1,1)))
 		model = Sequential()
 		model.add(Merge([a, b], mode='concat', concat_axis=1))
-		expected = ("          InputLayer (None, 1, 1)                  InputLayer (None, 1, 1)                                                 " + "\n"
-					"             Reshape (None, 1, 1)                     Reshape (None, 1, 1)                                                 " + "\n"
-					"                     \______________________________________/                                                              " + "\n"
-					"                                        |                                                   InputLayer (None, 1, 1)        " + "\n"
-					"                                   Merge (None, 2, 1)                                          Reshape (None, 1, 1)        " + "\n"
-					"                                         \___________________________________________________________/                     " + "\n"
-					"                                                             |                                                             " + "\n"
-					"                                                        Merge (None, 3, 1)                                                 " + "\n"
+		expected = ("   InputLayer (None, 1, 1)    InputLayer (None, 1, 1)                            " + "\n"
+					"      Reshape (None, 1, 1)       Reshape (None, 1, 1)                            " + "\n"
+					"              \________________________/                                         " + "\n"
+					"                          |                              InputLayer (None, 1, 1) " + "\n"
+					"                     Merge (None, 2, 1)                     Reshape (None, 1, 1) " + "\n"
+					"                           \______________________________________/              " + "\n"
+					"                                        |                                        " + "\n"
+					"                                   Merge (None, 3, 1)                            " + "\n"
 				   )
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)

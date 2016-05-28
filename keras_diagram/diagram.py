@@ -30,6 +30,24 @@ class Node:
         children_width = sum([child.family_width for child in self.children])
         return max([children_width, self.node_width])
 
+    def compress(self):
+        self.trim(self.min_text_width())
+
+    def trim(self, text_width):
+        for child in self.children:
+            child.trim(text_width)
+        to_remove = (len(self.text) - text_width) / 2
+        if to_remove > 0:
+            self.text = self.text[to_remove:-to_remove]
+            self.node_width = len(self.text)
+            self.family_width = self._calculate_family_width()
+
+    def min_text_width(self):
+        t = self.text
+        while (t.startswith('  ') and t.endswith('  ')):
+            t = t[1:-1]
+        return max([len(t)] + [child.min_text_width() for child in self.children])
+
     def canvas(self):
         canvas = Canvas()
         arrows = []
@@ -49,6 +67,7 @@ class Node:
         return canvas
 
     def render(self):
+        self.compress()
         return str(self.canvas())
 
 class Canvas:
