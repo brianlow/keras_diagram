@@ -5,6 +5,7 @@ from keras.models import *
 from keras.layers.core import *
 from keras.layers.embeddings import *
 from keras.layers.convolutional import *
+from keras.layers import LSTM
 
 class DiagramTest(unittest.TestCase):
 
@@ -63,28 +64,55 @@ class DiagramTest(unittest.TestCase):
 		actual = ascii(model)
 		self.assertStringsEqual(actual, expected)
 
-	def test_different_widths_different_heights(self):
-		a1 = Sequential()
-		a1.add(Reshape((1, 1), input_shape=(1,1)))
-		a2 = Sequential()
-		a2.add(Reshape((1, 1), input_shape=(1,1)))
-		a = Sequential()
-		a.add(Merge([a1, a1], mode='concat', concat_axis=1))
-		b = Sequential()
-		b.add(Reshape((1, 1), input_shape=(1,1)))
-		model = Sequential()
-		model.add(Merge([a, b], mode='concat', concat_axis=1))
-		expected = ("   InputLayer (None, 1, 1)    InputLayer (None, 1, 1)                            " + "\n"
-					"      Reshape (None, 1, 1)       Reshape (None, 1, 1)                            " + "\n"
-					"              \________________________/                                         " + "\n"
-					"                          |                              InputLayer (None, 1, 1) " + "\n"
-					"                     Merge (None, 2, 1)                     Reshape (None, 1, 1) " + "\n"
-					"                           \______________________________________/              " + "\n"
-					"                                        |                                        " + "\n"
-					"                                   Merge (None, 3, 1)                            " + "\n"
+	def test_babi_memnn(self):
+		input_encoder_m = Sequential()
+		input_encoder_m.add(Embedding(input_dim=22, output_dim=64, input_length=68))
+		input_encoder_m.add(Dropout(0.3))
+
+		question_encoder = Sequential()
+		question_encoder.add(Embedding(input_dim=22, output_dim=64, input_length=4))
+		question_encoder.add(Dropout(0.3))
+
+		match = Sequential()
+		match.add(Merge([input_encoder_m, question_encoder], mode='dot', dot_axes=[2, 2]))
+
+		input_encoder_c = Sequential()
+		input_encoder_c.add(Embedding(input_dim=22, output_dim=4, input_length=68))
+		input_encoder_c.add(Dropout(0.3))
+
+		response = Sequential()
+		response.add(Merge([match, input_encoder_c], mode='sum'))
+		response.add(Permute((2, 1)))
+
+		answer = Sequential()
+		answer.add(Merge([response, question_encoder], mode='concat', concat_axis=-1))
+		answer.add(LSTM(32))
+		answer.add(Dropout(0.3))
+		answer.add(Dense(22))
+		answer.add(Activation('softmax'))
+
+		expected = ("     InputLayer (None, 68)          InputLayer (None, 4)                                                                    " + "\n"
+					"      Embedding (None, 68, 64)       Embedding (None, 4, 64)                                                                " + "\n"
+					"        Dropout (None, 68, 64)         Dropout (None, 4, 64)                                                                " + "\n"
+					"                \____________________________/                     InputLayer (None, 68)                                    " + "\n"
+					"                              |                                     Embedding (None, 68, 4)                                 " + "\n"
+					"                         Merge (None, 68, 4)                          Dropout (None, 68, 4)                                 " + "\n"
+					"                               \____________________________________________/                                               " + "\n"
+					"                                              |                                                   InputLayer (None, 4)      " + "\n"
+					"                                         Merge (None, 68, 4)                                       Embedding (None, 4, 64)  " + "\n"
+					"                                       Permute (None, 4, 68)                                         Dropout (None, 4, 64)  " + "\n"
+					"                                               \___________________________________________________________/                " + "\n"
+					"                                                             |                                                              " + "\n"
+					"                                                        Merge (None, 4, 132)                                                " + "\n"
+					"                                                         LSTM (None, 32)                                                    " + "\n"
+					"                                                      Dropout (None, 32)                                                    " + "\n"
+					"                                                        Dense (None, 22)                                                    " + "\n"
+					"                                                      Softmax (None, 22)                                                    " + "\n"
 				   )
-		actual = ascii(model)
+
+		actual = ascii(answer)
 		self.assertStringsEqual(actual, expected)
+
 
 	def assertStringsEqual(self, s1, s2):
 		if s1 != s2:
