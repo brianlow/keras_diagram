@@ -2,7 +2,7 @@ from setuptools import setup
 import pypandoc
 
 setup(name='keras_diagram',
-      version='1.0.0',
+      version='1.0.1',
       description='Keras models as ASCII diagrams',
       long_description=pypandoc.convert('README.md','rst',format='markdown'),
       url='http://github.com/brianlow/keras_diagram',
