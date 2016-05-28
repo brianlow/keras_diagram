@@ -1,10 +1,8 @@
 Keras Diagram
 =============
 
-Print ASCII diagrams of your Keras models to visualize the layers and
-their shapes
-
-::
+Print ASCII diagrams of your Keras models to visualize
+the layers and their shapes
 
           InputLayer (None, 50, 300)
              Reshape (None, 1, 50, 300)
@@ -16,17 +14,15 @@ their shapes
                Dense (None, 7)
              Softmax (None, 7)
 
+
 To install
 ----------
 
-::
-
     pip install keras_diagram
+
 
 To use
 ------
-
-::
 
     from keras_diagram import ascii
 
@@ -34,3 +30,11 @@ To use
     model.add(...)
 
     print ascii(model)
+
+
+Developing
+------
+
+     ./test.py       # run tests via docker
+     ./publish.py    # build distributions and publish to pypi
+     ./shell.py      # run bash above docker container with current folder mounted

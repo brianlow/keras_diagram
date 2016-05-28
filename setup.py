@@ -1,9 +1,10 @@
 from setuptools import setup
+import pypandoc
 
 setup(name='keras_diagram',
       version='1.0.0',
       description='Keras models as ASCII diagrams',
-      long_description=open('README.rst').read(),
+      long_description=pypandoc.convert('README.md','rst',format='markdown'),
       url='http://github.com/brianlow/keras_diagram',
       author='Brian Low',
       author_email='brian.low22@gmail.com',

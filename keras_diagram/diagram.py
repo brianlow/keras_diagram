@@ -1,10 +1,3 @@
-# todo - customized format string (name, classname, shape, shape_without_none, shape_bare) - maybe accept func
-# todo - remove whitespace border (better is remove whitespace per column, good enough may be customize format string)
-# todo - width of each branch dependent on text in the branch
-# todo - collapse whitespace on either side of layer list (use max width of layers in a node)
-# todo - colored output
-# todo - better name?
-
 import numpy as np
 import string
 import ctypes
