@@ -7,9 +7,10 @@ from keras.layers.core import *
 import pdb
 
 class Node:
-    def __init__(self, layer):
+    def __init__(self, model, layer):
+        self.model = model
         self.layer = layer
-        self.text = "%20s %-20s" %  (self._name(), layer.output_shape)
+        self.text = "%20s %-20s" %  (self._name(), self._output_shape())
         self.children = self._calculate_children()
         self.node_width = len(self.text)
         self.family_width = self._calculate_family_width()
@@ -23,12 +24,28 @@ class Node:
 
     def _calculate_children(self):
         layers = list(_flatten([node.inbound_layers for node in self.layer.inbound_nodes]))
+        layers = set(layers) & set(self.model.layers)
         layers = [l.layers[-1] if issubclass(type(l), Model) else l for l in layers]
-        return [Node(l) for l in layers]
+        return [Node(self.model, l) for l in layers]
 
     def _calculate_family_width(self):
         children_width = sum([child.family_width for child in self.children])
         return max([children_width, self.node_width])
+
+    def _output_shape(self):
+        if len(self.layer.inbound_nodes) == 1:
+            return self.layer.output_shape
+        else:
+            for index, node in enumerate(self.layer.inbound_nodes):
+                if not set(node.inbound_layers).isdisjoint(self.model.layers):
+                    return self.layer.get_output_shape_at(0)
+
+    def _get_model_layers(self):
+        pdb.set_trace()
+        return _flatten([self._get_model_layers_internal(layer) for layer in self.model.inbound_layers])
+
+    def _get_model_layers_internal(self, layer):
+        return [layer] + _flatten([node.outbound_layers for node in layer.outbound_nodes])
 
     def compress(self):
         self.trim(self.min_text_width())
@@ -166,6 +183,6 @@ def _flatten(items):
 
 
 def ascii(model):
-    node = Node(model.layers[-1])
+    node = Node(model, model.layers[-1])
     return node.render()
 

@@ -5,6 +5,7 @@ from keras.models import *
 from keras.layers.core import *
 from keras.layers.embeddings import *
 from keras.layers.convolutional import *
+from keras.engine.topology import *
 from keras.layers import LSTM
 
 class DiagramTest(unittest.TestCase):
@@ -113,12 +114,37 @@ class DiagramTest(unittest.TestCase):
 		actual = ascii(answer)
 		self.assertStringsEqual(actual, expected)
 
+	def test_shared_embedding(self):
+		embedding = Embedding(input_dim=20, output_dim=64)
+		model1 = self.build_model_with_shared_embedding(111, embedding)
+		model2 = self.build_model_with_shared_embedding(222, embedding)
+
+		expected = ("      InputLayer (None, 111)     " + "\n"
+					"       Embedding (None, 111, 64) " + "\n"
+					"         Flatten (None, 7104)    " + "\n"
+					"           Dense (None, 1)       " + "\n"
+				   )
+		actual = ascii(model1)
+		self.assertStringsEqual(actual, expected)
+
+	def build_model_with_shared_embedding(self, input_length, embedding):
+		input = Input(shape=(input_length,), dtype="int32")
+		x = Flatten()(embedding(input))
+		output = Dense(output_dim=1, input_dim=embedding.output_dim * input_length, activation="sigmoid")(x)
+		model = Model(input=[input], output=[output])
+		return model
 
 	def assertStringsEqual(self, s1, s2):
 		if s1 != s2:
 			diff = ndiff(s1.splitlines(1), s2.splitlines(1))
+			print
+			print('Actual:')
 			print(s1)
 			print
+			print('Expected:')
+			print(s2)
+			print
+			print('Diff:')
 			print(''.join(diff))
 			self.assertEqual(s1, s2, msg='Strings a different')
 
