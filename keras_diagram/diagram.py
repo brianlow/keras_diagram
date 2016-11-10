@@ -17,7 +17,7 @@ class Node:
 
     def _name(self):
         if type(self.layer) is Activation:
-            return self.layer.activation.func_name.title()
+            return self.layer.activation.__name__.title()
         else:
             return self.layer.__class__.__name__
 
