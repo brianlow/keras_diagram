@@ -76,7 +76,7 @@ class Canvas:
 
     def __str__(self):
         s = ""
-        for i in xrange(len(self.chars)):
+        for i in range(len(self.chars)):
             s += string.join(self.chars[i], '') + "\n"
         return s
 
