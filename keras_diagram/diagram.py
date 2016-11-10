@@ -36,7 +36,7 @@ class Node:
     def trim(self, text_width):
         for child in self.children:
             child.trim(text_width)
-        to_remove = (len(self.text) - text_width) / 2
+        to_remove = (len(self.text) - text_width) // 2
         if to_remove > 0:
             self.text = self.text[to_remove:-to_remove]
             self.node_width = len(self.text)
