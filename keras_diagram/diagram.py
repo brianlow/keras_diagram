@@ -77,7 +77,7 @@ class Canvas:
     def __str__(self):
         s = ""
         for i in range(len(self.chars)):
-            s += ''.join(self.chars[i], '') + "\n"
+            s += ''.join(self.chars[i]) + "\n"
         return s
 
     def height(self):
