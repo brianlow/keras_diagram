@@ -33,6 +33,8 @@ To install
 ----------
 
     pip install keras_diagram
+    
+    Pre-requisite in Conda Installation (Python 3.5): pip install pypandoc
 
 
 To use
