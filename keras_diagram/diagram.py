@@ -17,7 +17,7 @@ class Node:
 
     def _name(self):
         if type(self.layer) is Activation:
-            return self.layer.activation.func_name.title()
+            return self.layer.activation.__name__.title()
         else:
             return self.layer.__class__.__name__
 
@@ -36,7 +36,7 @@ class Node:
     def trim(self, text_width):
         for child in self.children:
             child.trim(text_width)
-        to_remove = (len(self.text) - text_width) / 2
+        to_remove = (len(self.text) - text_width) // 2
         if to_remove > 0:
             self.text = self.text[to_remove:-to_remove]
             self.node_width = len(self.text)
@@ -76,8 +76,8 @@ class Canvas:
 
     def __str__(self):
         s = ""
-        for i in xrange(len(self.chars)):
-            s += string.join(self.chars[i], '') + "\n"
+        for i in range(len(self.chars)):
+            s += ''.join(self.chars[i]) + "\n"
         return s
 
     def height(self):
