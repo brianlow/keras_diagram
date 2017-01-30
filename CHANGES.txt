@@ -1,3 +1,4 @@
+v1.0.5, 2017-01-29 -- pre-req update by @vyraun
 v1.0.3, 2017-01-29 -- misc fixes by @jewfro-cuban
 v1.0.1, 2016-05-27 -- Centered and compressed layout
 v1.0.0, 2016-05-25 -- Initial release
