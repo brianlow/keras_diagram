@@ -4,7 +4,6 @@ import ctypes
 from ctypes import create_string_buffer
 from keras.models import Model
 from keras.layers.core import *
-import pdb
 
 class Node:
     def __init__(self, layer):
